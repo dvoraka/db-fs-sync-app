@@ -1,1 +1,98 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+plugins {
+    id 'org.springframework.boot' version '2.2.1.RELEASE'
+}
+
 apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'application'
+apply plugin: 'jacoco'
+
+version = '0.1.0-SNAPSHOT'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom SpringBootPlugin.BOM_COORDINATES
+    }
+}
+
+dependencies {
+    // Spring Boot starters
+    implementation('org.springframework.boot:spring-boot-starter')
+    implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+    implementation('org.springframework.boot:spring-boot-starter-logging')
+
+    // PostgreSQL driver
+//    runtime('org.postgresql:postgresql')
+    // H2 driver
+    runtimeOnly('com.h2database:h2')
+
+    // Lombok
+    compileOnly('org.projectlombok:lombok')
+    annotationProcessor('org.projectlombok:lombok')
+
+    // Guava
+    implementation group: 'com.google.guava', name: 'guava', version: '27.1-jre'
+
+    // Testing
+    // Spring testing
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    // Spock
+    testImplementation('org.spockframework:spock-core:1.1-groovy-2.4')
+    testImplementation('org.spockframework:spock-spring:1.1-groovy-2.4')
+
+    // Development tools
+    annotationProcessor('org.springframework.boot:spring-boot-configuration-processor')
+    implementation('org.springframework.boot:spring-boot-devtools')
+}
+
+sourceSets {
+    // integration tests
+    integrationTest {
+        groovy.srcDir file('src/integration-test/groovy')
+        resources.srcDir file('src/integration-test/resources')
+
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += output + compileClasspath
+    }
+}
+
+configurations {
+    // IT
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+task integrationTest(type: Test) {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+
+    mustRunAfter test
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:all"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
+wrapper {
+    gradleVersion = '6.0.1'
+    distributionType = Wrapper.DistributionType.ALL
+}
+
+check.dependsOn integrationTest
+check.dependsOn jacocoTestReport
