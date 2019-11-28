@@ -3,12 +3,17 @@ package dvoraka.dbfssyncapp.domain;
 import lombok.Data;
 
 import javax.persistence.Entity;
-import java.nio.file.Path;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 @Data
 @Entity
 public class File {
 
+    @Id
+    @GeneratedValue
+    private Integer id;
+
     private String name;
-    private Path path;
+    private String path;
 }
