@@ -36,13 +36,13 @@ public class App {
     @Bean
     public CommandLineRunner runner() {
         return args -> {
-            System.out.println("App");
 
+            // files cleanup
             fileService.deleteFile("test2");
             fileService.deleteFile("test3");
 
+            // service calls
             testingService.saveFile("test2");
-
             try {
                 testingService.saveFileWithRollback("test3");
             } catch (TestingException e) {
