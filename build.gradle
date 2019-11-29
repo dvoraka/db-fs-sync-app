@@ -9,6 +9,7 @@ apply plugin: 'groovy'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'application'
 apply plugin: 'jacoco'
+apply plugin: 'maven'
 
 version = '0.1.0-SNAPSHOT'
 sourceCompatibility = 1.8
@@ -92,6 +93,16 @@ jacocoTestReport {
 wrapper {
     gradleVersion = '6.0.1'
     distributionType = Wrapper.DistributionType.ALL
+}
+
+task createPom {
+    pom {
+        project {
+            groupId 'dvoraka'
+            artifactId 'db-fs-sync-app'
+            version '0.1.0-SNAPSHOT'
+        }
+    }.writeTo('pom.xml')
 }
 
 check.dependsOn integrationTest
