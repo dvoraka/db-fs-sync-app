@@ -1,6 +1,8 @@
 package dvoraka.dbfssyncapp;
 
+import dvoraka.dbfssyncapp.exception.TestingException;
 import dvoraka.dbfssyncapp.service.FileService;
+import dvoraka.dbfssyncapp.service.TestingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -13,7 +15,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class App {
 
     @Autowired
-    FileService fileService;
+    private FileService fileService;
+    @Autowired
+    private TestingService testingService;
 
 
     public static void main(String[] args) {
@@ -25,7 +29,12 @@ public class App {
         return args -> {
             System.out.println("App");
 
-            fileService.saveFile("test1");
+            testingService.saveFile("test2");
+
+            try {
+                testingService.saveFileWithRollback("test3");
+            } catch (TestingException e) {
+            }
         };
     }
 }
