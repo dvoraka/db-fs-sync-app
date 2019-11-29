@@ -15,4 +15,9 @@ public class DefaultFileService implements FileService {
         Path path = Paths.get(filename);
         Files.write(path, new byte[0]);
     }
+
+    @Override
+    public void deleteFile(String filename) throws IOException {
+        Files.deleteIfExists(Paths.get(filename));
+    }
 }
