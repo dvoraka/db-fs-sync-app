@@ -11,6 +11,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.io.IOException;
 
 @Slf4j
 @EnableJpaRepositories
@@ -46,5 +50,15 @@ public class App {
 
             log.info("Files: {}", fileRepository.findAll());
         };
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)
+    public void rollbackListener(FileEvent event) {
+        log.info("Event: {}", event);
+        try {
+            fileService.deleteFile(event.getFilename());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
